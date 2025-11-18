@@ -1,2 +1,63 @@
-# AppMoviles-MedicionAgua
-App para medicion del agua
+# Proyecto Medidor de Agua – Ionic + Angular + Supabase
+- Desarrollado por Jose Pila
+
+Este proyecto es una **aplicación móvil** desarrollada con **Ionic + Angular** que permite a los encargados de tomar lecturas de medidores de agua registrar las mediciones digitalmente, incluyendo fotos, ubicación y observaciones. Además, incluye un panel de **administración** para visualizar todas las lecturas y gestionar datos.
+
+---
+
+## 📋 Funcionalidades
+
+### Para usuarios medidores:
+- Registro de lectura de medidor con:
+  - Valor de la medición
+  - Observaciones
+  - Foto del medidor
+  - Foto de la vivienda
+  - Ubicación geográfica
+- Validación de campos obligatorios
+- Persistencia de datos en **Supabase**
+- Sesión de usuario (login/logout)
+
+### Para administradores:
+- Visualización de todas las lecturas en un **grid**
+- Vista detallada de cada lectura con fotos y ubicación
+- Eliminación de lecturas
+- Acceso controlado según el rol del usuario
+### Claves de acceso para prueba
+- Administrador
+-- Usuario: admin12345
+-- Password: abcde12345
+- Medidor
+-- Usuario: josepila0912
+-- Password: abcde12345
+---
+
+## 🛠 Tecnologías utilizadas
+
+- [Ionic 7](https://ionicframework.com/)
+- [Angular 16+](https://angular.io/)
+- [Supabase](https://supabase.com/) (autenticación, base de datos, almacenamiento)
+- Capacitor para funcionalidades de dispositivo (cámara, geolocalización)
+- HTML, SCSS y TypeScript
+
+---
+
+## ⚡ Requisitos previos
+
+Antes de ejecutar el proyecto:
+
+- Node.js ≥ 18
+- Ionic CLI ≥ 7
+- Angular CLI ≥ 16
+- Una cuenta en Supabase con proyecto creado
+- Capacitor configurado si se desea ejecutar en dispositivo o emulador
+
+---
+
+## 🔧 Instalación del proyecto
+
+1. Clonar el repositorio:
+
+```bash
+git clone <url-del-repositorio>
+cd <nombre-proyecto>
