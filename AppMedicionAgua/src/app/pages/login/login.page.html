@@ -1,0 +1,29 @@
+<ion-content>
+  <h2 class="title">Iniciar Sesion</h2>
+  <form [formGroup]="loginForm" (ngSubmit)="login()">
+    <ion-item>
+      <ion-input label="Usuario" formControlName="user">
+      </ion-input>
+    </ion-item>
+    <div class="error" *ngIf="loginForm.get('user')?.touched && loginForm.get('user')?.invalid">
+      <small *ngIf="loginForm.get('user')?.errors?.['required']">El usuario es obligatorio.</small>
+    </div>
+    <ion-item class="mt-2">
+      <ion-input label="Contraseña" type="password" formControlName="password"></ion-input>
+    </ion-item>
+    <div class="error" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
+      <small *ngIf="loginForm.get('password')?.errors?.['required']">La contraseña es obligatoria.</small>
+      <small *ngIf="loginForm.get('password')?.errors?.['minlength']">
+        Mínimo 6 caracteres.
+      </small>
+    </div>
+    <ion-button
+      expand="block"
+      type="submit"
+      [disabled]="loading || loginForm.invalid"
+      class="mt-3"
+    >
+      {{ loading ? 'Ingresando...' : 'Ingresar' }}
+    </ion-button>
+  </form>
+</ion-content>

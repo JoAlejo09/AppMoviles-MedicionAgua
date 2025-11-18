@@ -1,46 +1,126 @@
-import { Injectable, inject } from '@angular/core';
-import { createClient, type SupabaseClient, type Session } from '@supabase/supabase-js';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { createClient, SupabaseClient, Session } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
+
 @Injectable({
   providedIn: 'root',
 })
 export class SupabaseService {
-  // Definición de las propiedades y el constructor aquí
-  private supabase: SupabaseClient; // cliente
-  private _session$ = new BehaviorSubject<Session | null>(null); //control de ssesion
-  session$ = this._session$.asObservable();
-  //  
-  
+
+  private supabase: SupabaseClient;
+
   constructor() {
-    this.supabase = createClient(environment.supabaseURL, environment.supabaseAnonKey);
-    // Recupera sesión al iniciar
-    this.supabase.auth.getSession().then(({ data }) => this._session$.next(data.session));
-    // Escucha cambios de sesión (login/logout/refresh)
-    this.supabase.auth.onAuthStateChange((_event, session) => {
-      this._session$.next(session);
-    }); 
+    this.supabase = createClient(
+      environment.supabaseURL,
+      environment.supabaseAnonKey
+    );
   }
-  //obtener cliente
-  get client() {
-    return this.supabase; 
+
+  // ============================
+  // AUTH
+  // ============================
+  async signUp(email: string, password: string) {
+    return await this.supabase.auth.signUp({ email, password });
   }
-  // metodo para conectar usuario  
+
   async signIn(email: string, password: string) {
-    const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    return data;
+    return await this.supabase.auth.signInWithPassword({ email, password });
   }
-  // metodo para cerrar sesion
+
   async signOut() {
-    const { error } = await this.supabase.auth.signOut();
-    if (error) throw error;
+    return await this.supabase.auth.signOut();
   }
-  //oBTENER LA SESION ACTUAL
-  async getCurrentSession() {
+
+  async getSession(): Promise<Session | null> {
     const { data } = await this.supabase.auth.getSession();
     return data.session;
   }
-  
-  
+
+  async getUser() {
+    return (await this.supabase.auth.getUser()).data.user;
+  }
+
+  // ============================
+  // PERFILES
+  // ============================
+  async createProfile(userId: string, nombre: string, rol: string) {
+    const { data, error } = await this.supabase
+      .from('usuarios')
+      .upsert({ id: userId, nombre, rol });
+
+    if (error) throw error;
+    return data;
+  }
+
+  // ============================
+  // STORAGE
+  // ============================
+  async cargarFotos(bucket: string, path: string, file: File) {
+    const { error } = await this.supabase.storage
+      .from(bucket)
+      .upload(path, file, { upsert: true });
+
+    if (error) throw error;
+
+    return this.supabase.storage
+      .from(bucket)
+      .getPublicUrl(path).data.publicUrl;
+  }
+
+  // ============================
+  // LECTURAS
+  // ============================
+  async insertarLectura(payload: any) {
+    const { data, error } = await this.supabase
+      .from('lecturas')
+      .insert(payload)
+      .select();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async obtenerLecturas() {
+    const { data: { user } } = await this.supabase.auth.getUser();
+
+    const { data, error } = await this.supabase
+      .from('lecturas')
+      .select('*')
+      .eq('user_id', user?.id);
+
+    if (error) throw error;
+    return data;
+  }
+
+  async obtenerTodaslasLecturas() {
+    const { data, error } = await this.supabase
+      .from('lecturas')
+      .select('*');
+
+    if (error) throw error;
+    return data;
+  }
+  //METODO PARA OBTENER ROL DE USUARIO
+  async getUserRol(userId:string){
+    const { data, error} = await this.supabase
+    .from('usuarios')
+    .select('rol')
+    .eq('id',userId)
+    .single();
+
+    return{rol: data?.rol, error}
+  }
+  async getEmailUser(user:string): Promise<string| null>{
+    const {data, error} = await this.supabase
+    .from('usuarios')
+    .select('email')
+    .eq('username', user)
+    .single();
+    if (error || !data) return null;
+
+    return data?.email
+  }
+  async resetPassword(email:string){
+    return await this.supabase.auth.resetPasswordForEmail(email);
+  }
 }
