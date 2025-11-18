@@ -15,10 +15,7 @@ export class SupabaseService {
       environment.supabaseAnonKey
     );
   }
-
-  // ============================
-  // AUTH
-  // ============================
+  // AUTENTICACION
   async signUp(email: string, password: string) {
     return await this.supabase.auth.signUp({ email, password });
   }
@@ -39,10 +36,7 @@ export class SupabaseService {
   async getUser() {
     return (await this.supabase.auth.getUser()).data.user;
   }
-
-  // ============================
   // PERFILES
-  // ============================
   async createProfile(userId: string, nombre: string, rol: string) {
     const { data, error } = await this.supabase
       .from('usuarios')
@@ -51,10 +45,7 @@ export class SupabaseService {
     if (error) throw error;
     return data;
   }
-
-  // ============================
   // STORAGE
-  // ============================
   async cargarFotos(bucket: string, path: string, file: File) {
     const { error } = await this.supabase.storage
       .from(bucket)
@@ -66,10 +57,7 @@ export class SupabaseService {
       .from(bucket)
       .getPublicUrl(path).data.publicUrl;
   }
-
-  // ============================
   // LECTURAS
-  // ============================
   async insertarLectura(payload: any) {
     const { data, error } = await this.supabase
       .from('lecturas')
@@ -98,7 +86,15 @@ export class SupabaseService {
       .select('*');
 
     if (error) throw error;
-    return data;
+    return {data,error};
+  }
+   async eliminarLectura(id:string) {
+    const { error } = await this.supabase
+      .from('lecturas')
+      .delete()
+      .eq('id', id);
+      if (error) throw error;
+      return alert("lectura eliminada");
   }
   //METODO PARA OBTENER ROL DE USUARIO
   async getUserRol(userId:string){
